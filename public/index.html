@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pterodavtyl XYZ - Panel</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0f1419;
+      color: #e0e0e0;
+    }
+
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .login-box {
+      background: #1a1f2e;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-box h1 {
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 28px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      background: #0f1419;
+      border: 1px solid #333;
+      border-radius: 5px;
+      color: #e0e0e0;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .error {
+      color: #ff6b6b;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    /* Dashboard Styles */
+    .dashboard {
+      display: none;
+      background: #0f1419;
+    }
+
+    .header {
+      background: #1a1f2e;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #333;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logout-btn {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: #ff5252;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-box {
+      background: #1a1f2e;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+
+    .stat-box h3 {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .stat-box .value {
+      font-size: 28px;
+      font-weight: 600;
+    }
+
+    .servers-section h2 {
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .servers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .server-card {
+      background: #1a1f2e;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #333;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .server-card:hover {
+      transform: translateY(-5px);
+      border-color: #667eea;
+    }
+
+    .server-card .header {
+      border: none;
+      padding: 0;
+      margin-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .server-card h3 {
+      font-size: 18px;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-badge.running {
+      background: #51cf66;
+      color: #000;
+    }
+
+    .status-badge.stopped {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .server-info {
+      margin-bottom: 15px;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .server-info p {
+      margin-bottom: 5px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .button-group button {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    .button-group .start-btn {
+      background: #51cf66;
+      color: #000;
+    }
+
+    .button-group .stop-btn {
+      background: #ff6b6b;
+      color: white;
+    }
+
+    .button-group .edit-btn {
+      background: #667eea;
+      color: white;
+    }
+
+    .button-group button:hover {
+      opacity: 0.8;
+    }
+
+    .logs-container {
+      background: #0a0d12;
+      border: 1px solid #333;
+      border-radius: 5px;
+      padding: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      height: 200px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      color: #51cf66;
+    }
+
+    .logs-container .log-line {
+      margin-bottom: 5px;
+      word-break: break-all;
+    }
+
+    .file-upload {
+      border: 2px dashed #667eea;
+      border-radius: 5px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .file-upload:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
+
+    .file-upload input[type="file"] {
+      display: none;
+    }
+
+    .files-list {
+      margin-top: 15px;
+    }
+
+    .file-item {
+      background: #0a0d12;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+
+    .file-item .delete-btn {
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #1a1f2e;
+      padding: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .modal-content h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-content .form-group {
+      margin-bottom: 15px;
+    }
+
+    .eggs-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+
+    .egg-card {
+      background: #0a0d12;
+      padding: 15px;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .egg-card:hover {
+      border-color: #667eea;
+    }
+
+    .egg-card .image {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    .egg-card .name {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .egg-card .description {
+      font-size: 11px;
+      color: #999;
+    }
+
+    @media (max-width: 768px) {
+      .servers-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="login-container">
+  <div class="login-box">
+    <h1>🎮 PTERODAVTYL XYZ</h1>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required placeholder="Default: xyz">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required placeholder="Default: 123">
+      </div>
+      <button type="submit" class="btn">Login</button>
+      <div id="loginError" class="error"></div>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD PAGE -->
+<div id="dashboardPage" class="dashboard">
+  <div class="header">
+    <h1>🎮 PTERODAVTYL XYZ</h1>
+    <div>
+      <span id="userDisplay"></span>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-box">
+        <h3>Total Servers</h3>
+        <div class="value" id="totalServers">0</div>
+      </div>
+      <div class="stat-box">
+        <h3>Running</h3>
+        <div class="value" id="runningServers">0</div>
+      </div>
+      <div class="stat-box">
+        <h3>Stopped</h3>
+        <div class="value" id="stoppedServers">0</div>
+      </div>
+    </div>
+
+    <!-- Create Server -->
+    <div style="margin-bottom: 30px;">
+      <button class="btn" onclick="openCreateModal()" style="width: auto; padding: 10px 20px;">+ Create Server</button>
+    </div>
+
+    <!-- Servers Grid -->
+    <div class="servers-section">
+      <h2>Your Servers</h2>
+      <div class="servers-grid" id="serversGrid">
+        <p style="color: #999;">No servers yet. Create one to get started!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE SERVER MODAL -->
+<div id="createModal" class="modal">
+  <div class="modal-content">
+    <h2>Create New Server</h2>
+    <div class="form-group">
+      <label for="serverName">Server Name</label>
+      <input type="text" id="serverName" placeholder="My Bot Server">
+    </div>
+    <div class="form-group">
+      <label for="serverType">Select Template (Egg)</label>
+      <div class="eggs-list" id="eggsList"></div>
+    </div>
+    <input type="hidden" id="selectedEgg">
+    <br>
+    <button class="btn" onclick="createServer()" style="margin-top: 20px;">Create Server</button>
+    <button class="btn" onclick="closeCreateModal()" style="background: #666; margin-top: 10px;">Cancel</button>
+  </div>
+</div>
+
+<!-- SERVER DETAILS MODAL -->
+<div id="serverModal" class="modal">
+  <div class="modal-content">
+    <h2 id="serverModalTitle">Server Details</h2>
+    <div id="serverModalContent"></div>
+    <button class="btn" onclick="closeServerModal()" style="background: #666; margin-top: 20px;">Close</button>
+  </div>
+</div>
+
+<script>
+  const API_URL = window.location.origin;
+  let token = localStorage.getItem('token');
+  let currentUser = JSON.parse(localStorage.getItem('user')) || null;
+  let servers = [];
+  let currentServerId = null;
+
+  // Initialize
+  if (token && currentUser) {
+    showDashboard();
+  } else {
+    showLogin();
+  }
+
+  function showLogin() {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('dashboardPage').style.display = 'none';
+  }
+
+  function showDashboard() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+    document.getElementById('userDisplay').textContent = `👤 ${currentUser.username}`;
+    loadServers();
+    loadEggs();
+  }
+
+  // LOGIN
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    try {
+      const res = await fetch(`${API_URL}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!res.ok) throw new Error('Login failed');
+
+      const data = await res.json();
+      token = data.token;
+      currentUser = data.user;
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(currentUser));
+
+      showDashboard();
+    } catch (err) {
+      document.getElementById('loginError').textContent = err.message;
+    }
+  });
+
+  function logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    token = null;
+    currentUser = null;
+    showLogin();
+  }
+
+  // LOAD SERVERS
+  async function loadServers() {
+    try {
+      const res = await fetch(`${API_URL}/api/servers`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      servers = await res.json();
+      renderServers();
+      updateStats();
+    } catch (err) {
+      console.error('Failed to load servers:', err);
+    }
+  }
+
+  function updateStats() {
+    document.getElementById('totalServers').textContent = servers.length;
+    document.getElementById('runningServers').textContent = servers.filter(s => s.status === 'running').length;
+    document.getElementById('stoppedServers').textContent = servers.filter(s => s.status === 'stopped').length;
+  }
+
+  function renderServers() {
+    const grid = document.getElementById('serversGrid');
+
+    if (servers.length === 0) {
+      grid.innerHTML = '<p style="color: #999;">No servers yet. Create one to get started!</p>';
+      return;
+    }
+
+    grid.innerHTML = servers.map(server => `
+      <div class="server-card">
+        <div class="header">
+          <h3>${server.name}</h3>
+          <span class="status-badge ${server.status}">${server.status.toUpperCase()}</span>
+        </div>
+        <div class="server-info">
+          <p><strong>Type:</strong> ${server.type}</p>
+          <p><strong>Port:</strong> ${server.port}</p>
+          <p><strong>Created:</strong> ${new Date(server.created_at).toLocaleDateString()}</p>
+        </div>
+        <div class="button-group">
+          <button class="start-btn" onclick="startServer(${server.id})">Start</button>
+          <button class="stop-btn" onclick="stopServer(${server.id})">Stop</button>
+          <button class="edit-btn" onclick="openServerModal(${server.id})">Manage</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // EGGS
+  async function loadEggs() {
+    try {
+      const res = await fetch(`${API_URL}/api/eggs`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const eggs = await res.json();
+      const eggsList = document.getElementById('eggsList');
+
+      eggsList.innerHTML = eggs.map(egg => `
+        <div class="egg-card" onclick="selectEgg(${egg.id}, '${egg.name}')">
+          <div class="image">${egg.image}</div>
+          <div class="name">${egg.name}</div>
+          <div class="description">${egg.description}</div>
+        </div>
+      `).join('');
+    } catch (err) {
+      console.error('Failed to load eggs:', err);
+    }
+  }
+
+  let selectedEggId = null;
+  function selectEgg(id, name) {
+    selectedEggId = id;
+    document.getElementById('selectedEgg').value = name;
+    document.querySelectorAll('.egg-card').forEach(card => card.style.borderColor = 'transparent');
+    event.target.closest('.egg-card').style.borderColor = '#667eea';
+  }
+
+  // CREATE SERVER
+  function openCreateModal() {
+    document.getElementById('createModal').classList.add('active');
+  }
+
+  function closeCreateModal() {
+    document.getElementById('createModal').classList.remove('active');
+    document.getElementById('serverName').value = '';
+    selectedEggId = null;
+  }
+
+  async function createServer() {
+    const name = document.getElementById('serverName').value;
+    const type = document.getElementById('selectedEgg').value;
+
+    if (!name || !type) {
+      alert('Please fill all fields and select an egg');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/api/servers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name, type })
+      });
+
+      if (!res.ok) throw new Error('Failed to create server');
+
+      closeCreateModal();
+      loadServers();
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  // SERVER CONTROL
+  async function startServer(serverId) {
+    try {
+      const res = await fetch(`${API_URL}/api/servers/${serverId}/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ scriptPath: null })
+      });
+
+      if (!res.ok) throw new Error('Failed to start server');
+
+      loadServers();
+      if (currentServerId === serverId) loadServerLogs(serverId);
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function stopServer(serverId) {
+    try {
+      const res = await fetch(`${API_URL}/api/servers/${serverId}/stop`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!res.ok) throw new Error('Failed to stop server');
+
+      loadServers();
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function loadServerLogs(serverId) {
+    try {
+      const res = await fetch(`${API_URL}/api/servers/${serverId}/logs`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+      const logsContainer = document.getElementById('logsContainer');
+
+      logsContainer.innerHTML = data.logs.map(log => `<div class="log-line">${log}</div>`).join('');
+      logsContainer.scrollTop = logsContainer.scrollHeight;
+    } catch (err) {
+      console.error('Failed to load logs:', err);
+    }
+  }
+
+  // SERVER MODAL
+  function openServerModal(serverId) {
+    currentServerId = serverId;
+    const server = servers.find(s => s.id === serverId);
+
+    if (!server) return;
+
+    const content = `
+      <h3>${server.name}</h3>
+      <p style="color: #999; margin-bottom: 20px;">Manage your server</p>
+
+      <h4 style="margin-top: 20px; margin-bottom: 10px;">📊 Logs</h4>
+      <div class="logs-container" id="logsContainer">Loading...</div>
+
+      <h4 style="margin-top: 20px; margin-bottom: 10px;">📁 Files</h4>
+      <div class="file-upload" onclick="document.getElementById('fileInput').click()">
+        <p>📤 Drag & drop your bot script here or click to browse</p>
+        <input type="file" id="fileInput" onchange="uploadFile(${serverId})">
+      </div>
+      <div class="files-list" id="filesList"></div>
+    `;
+
+    document.getElementById('serverModalContent').innerHTML = content;
+    document.getElementById('serverModal').classList.add('active');
+
+    loadServerLogs(serverId);
+    loadServerFiles(serverId);
+  }
+
+  function closeServerModal() {
+    document.getElementById('serverModal').classList.remove('active');
+    currentServerId = null;
+  }
+
+  // FILE MANAGEMENT
+  async function uploadFile(serverId) {
+    const file = document.getElementById('fileInput').files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await fetch(`${API_URL}/api/servers/${serverId}/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+
+      if (!res.ok) throw new Error('Upload failed');
+
+      loadServerFiles(serverId);
+      document.getElementById('fileInput').value = '';
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  }
+
+  async function loadServerFiles(serverId) {
+    try {
+      const res = await fetch(`${API_URL}/api/servers/${serverId}/files`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const files = await res.json();
+      const filesList = document.getElementById('filesList');
+
+      if (files.length === 0) {
+        filesList.innerHTML = '<p style="color: #999; margin-top: 10px;">No files uploaded</p>';
+        return;
+      }
+
+      filesList.innerHTML = files.map(file => `
+        <div class="file-item">
+          <div>
+            <strong>${file.filename}</strong><br>
+       
